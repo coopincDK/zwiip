@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import * as MediaLibrary from 'expo-media-library';
 
 const PAGE_SIZE = 20;
@@ -77,7 +77,7 @@ export function usePhotoLibrary() {
   }, []);
 
   // Lazy-enrich a photo with fileSize (called for current card only)
-  const fileSizeCache = React.useRef({});
+  const fileSizeCache = useRef({});
   const enrichPhoto = useCallback(async (photo) => {
     if (!photo) return photo;
     if (photo.fileSize > 0) return photo;
