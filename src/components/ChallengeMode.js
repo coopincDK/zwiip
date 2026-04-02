@@ -115,8 +115,8 @@ export default function ChallengeMode({ onStart, onEnd, sessionStats, onShowResu
 }
 
 const styles = StyleSheet.create({
-  startBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.primary + '20', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: COLORS.primary + '40', gap: 5 },
-  startBtnEmoji: { fontSize: 15 }, startBtnText: { fontSize: 11, fontWeight: '700', color: COLORS.primary }, startBtnSub: { fontSize: 9, color: COLORS.textSecondary },
+  startBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.primary, paddingHorizontal: 18, paddingVertical: 12, borderRadius: 16, gap: 10, elevation: 4, shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8 },
+  startBtnEmoji: { fontSize: 22 }, startBtnText: { fontSize: 15, fontWeight: '800', color: '#fff' }, startBtnSub: { fontSize: 11, color: 'rgba(255,255,255,0.7)' },
 
   timerContainer: { backgroundColor: COLORS.surface, borderRadius: 14, padding: 10, marginHorizontal: SPACING.lg },
   timerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, gap: 8 },
