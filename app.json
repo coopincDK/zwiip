@@ -47,8 +47,7 @@
           "isAccessMediaLocationEnabled": true
         }
       ],
-      "expo-localization",
-      "expo-store-review"
+      "expo-localization"
     ]
   }
 }
