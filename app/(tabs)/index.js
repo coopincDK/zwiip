@@ -409,6 +409,13 @@ export default function SwipeScreen() {
             <ActivityIndicator size="small" color={COLORS.textDim} />
           </View>
         )}
+        {nextPhoto && (
+          <SwipeCard
+            key={`next-${nextPhoto.id}`}
+            photo={nextPhoto}
+            isTop={false}
+          />
+        )}
         {currentPhoto && (
           <SwipeCard
             key={`top-${currentPhoto.id}`}
