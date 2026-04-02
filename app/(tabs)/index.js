@@ -462,7 +462,8 @@ export default function SwipeScreen() {
       {cooldownActive && swipeCooldownMs > 0 && (
         <View style={styles.cooldownOverlay} pointerEvents="none">
           <View style={styles.cooldownBadge}>
-            <Text style={styles.cooldownText}>\u23F1 Zwiip Safe</Text>
+            <Text style={styles.cooldownTitle}>Zwiip Safe</Text>
+            <Text style={styles.cooldownTimer}>{(settings.swipeCooldown).toFixed(1)}s</Text>
           </View>
         </View>
       )}
@@ -551,16 +552,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   cooldownOverlay: {
-    position: 'absolute', top: 60, left: 0, right: 0,
-    alignItems: 'center', zIndex: 30,
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    justifyContent: 'center', alignItems: 'center', zIndex: 30,
   },
   cooldownBadge: {
-    backgroundColor: 'rgba(108,92,231,0.85)',
-    paddingHorizontal: 16, paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: 'rgba(108,92,231,0.9)',
+    paddingHorizontal: 28, paddingVertical: 16,
+    borderRadius: 24, alignItems: 'center',
   },
-  cooldownText: {
-    color: '#fff', fontSize: 14, fontWeight: '700',
+  cooldownTitle: {
+    color: '#fff', fontSize: 18, fontWeight: '800',
+  },
+  cooldownTimer: {
+    color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: '600', marginTop: 4,
   },
   undoToast: {
     position: 'absolute', bottom: 100, left: 20, right: 20,
