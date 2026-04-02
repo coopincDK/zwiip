@@ -37,24 +37,16 @@ export function usePhotoLibrary() {
 
       const result = await MediaLibrary.getAssetsAsync(options);
       
-      // Fetch fileSize for each asset (getAssetsAsync doesn't include it)
-      const newPhotos = await Promise.all(result.assets.map(async asset => {
-        let fileSize = 0;
-        try {
-          const info = await MediaLibrary.getAssetInfoAsync(asset.id);
-          fileSize = info.fileSize || 0;
-        } catch (e) {}
-        return {
-          id: asset.id,
-          uri: asset.uri,
-          filename: asset.filename,
-          width: asset.width,
-          height: asset.height,
-          fileSize,
-          creationTime: asset.creationTime,
-          duration: asset.duration,
-          mediaType: asset.mediaType,
-        };
+      const newPhotos = result.assets.map(asset => ({
+        id: asset.id,
+        uri: asset.uri,
+        filename: asset.filename,
+        width: asset.width,
+        height: asset.height,
+        fileSize: 0, // fetched lazily via enrichPhoto
+        creationTime: asset.creationTime,
+        duration: asset.duration,
+        mediaType: asset.mediaType,
       }));
 
       if (reset) {
@@ -84,6 +76,24 @@ export function usePhotoLibrary() {
     }
   }, []);
 
+  // Lazy-enrich a photo with fileSize (called for current card only)
+  const fileSizeCache = React.useRef({});
+  const enrichPhoto = useCallback(async (photo) => {
+    if (!photo) return photo;
+    if (photo.fileSize > 0) return photo;
+    if (fileSizeCache.current[photo.id]) {
+      return { ...photo, fileSize: fileSizeCache.current[photo.id] };
+    }
+    try {
+      const info = await MediaLibrary.getAssetInfoAsync(photo.id);
+      const size = info.fileSize || 0;
+      fileSizeCache.current[photo.id] = size;
+      return { ...photo, fileSize: size };
+    } catch (e) {
+      return photo;
+    }
+  }, []);
+
   // Initial load
   useEffect(() => {
     (async () => {
@@ -105,5 +115,6 @@ export function usePhotoLibrary() {
     refresh: () => loadPhotos(true),
     deletePhotos,
     requestPermission,
+    enrichPhoto,
   };
 }

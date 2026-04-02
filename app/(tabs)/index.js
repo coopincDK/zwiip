@@ -40,7 +40,7 @@ export default function SwipeScreen() {
 
   const {
     photos, hasPermission, isLoading, hasMore,
-    totalCount, loadMore, requestPermission,
+    totalCount, loadMore, requestPermission, enrichPhoto,
   } = usePhotoLibrary();
 
   // Load album filter data when permission granted
@@ -209,8 +209,18 @@ export default function SwipeScreen() {
     return available;
   }, [photos, category, processedIds]);
 
-  const currentPhoto = availablePhotos[0];
+  const rawCurrentPhoto = availablePhotos[0];
   const nextPhoto = availablePhotos[1];
+  const [currentPhoto, setCurrentPhoto] = useState(null);
+
+  // Lazy-enrich current photo with fileSize
+  useEffect(() => {
+    if (!rawCurrentPhoto) { setCurrentPhoto(null); return; }
+    if (rawCurrentPhoto.fileSize > 0) { setCurrentPhoto(rawCurrentPhoto); return; }
+    let cancelled = false;
+    enrichPhoto(rawCurrentPhoto).then(p => { if (!cancelled) setCurrentPhoto(p); });
+    return () => { cancelled = true; };
+  }, [rawCurrentPhoto?.id]);
   const [challengeShowResult, setChallengeShowResult] = React.useState(false);
   const [focusMode, setFocusMode] = React.useState(false);
 
