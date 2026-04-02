@@ -37,7 +37,10 @@ export default function SwipeCard({
   fullscreen = false,
   containerHeight,
 }) {
-  const position = useRef(new Animated.ValueXY()).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+  // Legacy position object for overlays (they use pos.x)
+  const position = useRef({ x: translateX, y: translateY }).current;
   const didSwipe = useRef(false);
   const cbRef = useRef({ onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onTap, isTop, photo });
   cbRef.current = { onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onTap, isTop, photo };
@@ -54,42 +57,54 @@ export default function SwipeCard({
         if (dominated) didSwipe.current = true;
         return dominated;
       },
-      onPanResponderMove: (_, g) => position.setValue({ x: g.dx, y: g.dy }),
+      onPanResponderMove: (_, g) => {
+        translateX.setValue(g.dx);
+        translateY.setValue(g.dy);
+      },
       onPanResponderRelease: (_, gesture) => {
         const { onSwipeRight, onSwipeLeft, onSwipeUp, onSwipeDown, photo } = cbRef.current;
         const absX = Math.abs(gesture.dx);
         const absY = Math.abs(gesture.dy);
         const isH = absX > absY;
-        const animateOut = (toValue, cb) => {
-          Animated.timing(position, { toValue, duration: 250, useNativeDriver: false }).start(() => {
-            position.setValue({ x: 0, y: 0 });
+
+        const animateOut = (toX, toY, cb) => {
+          Animated.parallel([
+            Animated.timing(translateX, { toValue: toX, duration: 200, useNativeDriver: true }),
+            Animated.timing(translateY, { toValue: toY, duration: 200, useNativeDriver: true }),
+          ]).start(() => {
+            translateX.setValue(0);
+            translateY.setValue(0);
             cb();
           });
         };
+
         if (isH && gesture.dx > SWIPE_H_THRESHOLD) {
           didSwipe.current = true;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          animateOut({ x: SCREEN_WIDTH * 1.5, y: gesture.dy }, () => onSwipeRight && onSwipeRight(photo));
+          animateOut(SCREEN_WIDTH * 1.5, gesture.dy, () => onSwipeRight && onSwipeRight(photo));
         } else if (isH && gesture.dx < -SWIPE_H_THRESHOLD) {
           didSwipe.current = true;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          animateOut({ x: -SCREEN_WIDTH * 1.5, y: gesture.dy }, () => onSwipeLeft && onSwipeLeft(photo));
+          animateOut(-SCREEN_WIDTH * 1.5, gesture.dy, () => onSwipeLeft && onSwipeLeft(photo));
         } else if (!isH && gesture.dy < -SWIPE_V_THRESHOLD && onSwipeUp) {
           didSwipe.current = true;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          animateOut({ x: gesture.dx, y: -SCREEN_HEIGHT }, () => onSwipeUp(photo));
+          animateOut(gesture.dx, -SCREEN_HEIGHT, () => onSwipeUp(photo));
         } else if (!isH && gesture.dy > SWIPE_V_THRESHOLD && onSwipeDown) {
           didSwipe.current = true;
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          animateOut({ x: gesture.dx, y: SCREEN_HEIGHT }, () => onSwipeDown(photo));
+          animateOut(gesture.dx, SCREEN_HEIGHT, () => onSwipeDown(photo));
         } else {
-          Animated.spring(position, { toValue: { x: 0, y: 0 }, useNativeDriver: false }).start();
+          Animated.parallel([
+            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+          ]).start();
         }
       },
     })
   ).current;
 
-  const rotation = position.x.interpolate({
+  const rotation = translateX.interpolate({
     inputRange: [-SCREEN_WIDTH, 0, SCREEN_WIDTH],
     outputRange: ['-12deg', '0deg', '12deg'],
   });
@@ -106,27 +121,22 @@ export default function SwipeCard({
     ? new Date(photo.creationTime).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
     : '';
 
-  const cardW = fullscreen ? SCREEN_WIDTH : SCREEN_WIDTH - 32;
-
-  const cardStyle = isTop ? {
-    transform: [{ translateX: position.x }, { translateY: position.y }, { rotate: rotation }],
-  } : { transform: [{ scale: 0.95 }], opacity: 0.7 };
+  const cardStyle = fullscreen
+    ? { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 0 }
+    : containerHeight
+      ? { position: 'absolute', top: 0, left: 0, right: 0, height: containerHeight, borderRadius: 18 }
+      : { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 18 };
 
   return (
     <Animated.View
       style={[{
-        position: fullscreen ? 'relative' : 'absolute',
-        top: fullscreen ? undefined : 0,
-        left: fullscreen ? undefined : 16,
-        right: fullscreen ? undefined : 16,
-        bottom: fullscreen ? undefined : 0,
-        width: fullscreen ? SCREEN_WIDTH : undefined,
-        height: fullscreen ? SCREEN_HEIGHT * 0.85 : undefined,
-        borderRadius: fullscreen ? 0 : 10,
-        overflow: 'hidden',
-        backgroundColor: fullscreen ? '#000' : COLORS.surface,
-        elevation: fullscreen ? 0 : 5,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+        transform: [
+          { translateX },
+          { translateY },
+          { rotate: rotation },
+        ],
+        elevation: isTop ? 5 : 1,
+        shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
         shadowOpacity: fullscreen ? 0 : 0.3, shadowRadius: 8,
       }, cardStyle]}
       {...(isTop ? panResponder.panHandlers : {})}

@@ -209,18 +209,22 @@ export default function SwipeScreen() {
     return available;
   }, [photos, category, processedIds]);
 
-  const rawCurrentPhoto = availablePhotos[0];
+  const currentPhoto = availablePhotos[0];
   const nextPhoto = availablePhotos[1];
-  const [currentPhoto, setCurrentPhoto] = useState(null);
 
-  // Lazy-enrich current photo with fileSize
+  // Enrich current photo with fileSize in background (non-blocking)
+  const [enrichedSize, setEnrichedSize] = useState({});
   useEffect(() => {
-    if (!rawCurrentPhoto) { setCurrentPhoto(null); return; }
-    if (rawCurrentPhoto.fileSize > 0) { setCurrentPhoto(rawCurrentPhoto); return; }
+    if (!currentPhoto || currentPhoto.fileSize > 0) return;
+    if (enrichedSize[currentPhoto.id]) return;
     let cancelled = false;
-    enrichPhoto(rawCurrentPhoto).then(p => { if (!cancelled) setCurrentPhoto(p); });
+    enrichPhoto(currentPhoto).then(p => {
+      if (!cancelled && p.fileSize > 0) {
+        setEnrichedSize(prev => ({ ...prev, [p.id]: p.fileSize }));
+      }
+    });
     return () => { cancelled = true; };
-  }, [rawCurrentPhoto?.id]);
+  }, [currentPhoto?.id]);
   const [challengeShowResult, setChallengeShowResult] = React.useState(false);
   const [focusMode, setFocusMode] = React.useState(false);
 
@@ -408,7 +412,7 @@ export default function SwipeScreen() {
         {currentPhoto && (
           <SwipeCard
             key={`top-${currentPhoto.id}`}
-            photo={currentPhoto}
+            photo={currentPhoto.fileSize ? currentPhoto : { ...currentPhoto, fileSize: enrichedSize[currentPhoto.id] || 0 }}
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
             onSwipeUp={handleSwipeUp}
@@ -444,7 +448,7 @@ export default function SwipeScreen() {
           <View style={styles.focusContainer}>
             <SwipeCard
               key={`focus-${currentPhoto.id}`}
-              photo={currentPhoto}
+              photo={currentPhoto.fileSize ? currentPhoto : { ...currentPhoto, fileSize: enrichedSize[currentPhoto.id] || 0 }}
               onSwipeLeft={handleSwipeLeft}
               onSwipeRight={handleSwipeRight}
               onSwipeUp={handleSwipeUp}
