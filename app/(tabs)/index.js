@@ -474,8 +474,8 @@ export default function SwipeScreen() {
       </View>
 
       {/* Undo toast */}
-      {cooldownActive && swipeCooldownMs > 0 && cooldownRemaining > 500 && (
-        <View style={styles.cooldownOverlay} pointerEvents="none">
+      {cooldownActive && swipeCooldownMs > 0 && cooldownRemaining > 0 && (
+        <View style={[styles.cooldownOverlay, { opacity: cooldownRemaining < 500 ? cooldownRemaining / 500 : 1 }]} pointerEvents="none">
           <View style={styles.cooldownBadge}>
             <Text style={styles.cooldownTitle}>Zwiip Safe</Text>
             <Text style={styles.cooldownTimer}>{(cooldownRemaining / 1000).toFixed(1)}s</Text>
