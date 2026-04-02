@@ -20,6 +20,7 @@ const DEFAULT_SETTINGS = {
   swipeUp: { action: ACTIONS.SKIP, label: 'Spring over', emoji: E.skip, albumName: '' },
   swipeDown: { action: ACTIONS.SKIP, label: 'Spring over', emoji: E.skip, albumName: '' },
   skipAlbumPhotos: true,  // skip photos already sorted into albums
+  swipeCooldown: 0.5,  // seconds between swipes (0 = off, max 3)
 };
 
 export function SettingsProvider({ children }) {

@@ -235,8 +235,20 @@ export default function SwipeScreen() {
     }
   }, [availablePhotos.length, hasMore, isLoading]);
 
+  // Swipe cooldown
+  const lastSwipeTime = React.useRef(0);
+  const [cooldownActive, setCooldownActive] = useState(false);
+
   // Swipe action handler
   const handleSwipeAction = useCallback(async (photo, directionKey) => {
+    const cooldownMs = (settings.swipeCooldown || 0) * 1000;
+    if (cooldownMs > 0) {
+      const now = Date.now();
+      if (now - lastSwipeTime.current < cooldownMs) return; // still cooling down
+      lastSwipeTime.current = now;
+      setCooldownActive(true);
+      setTimeout(() => setCooldownActive(false), cooldownMs);
+    }
     const config = settings[directionKey];
     if (!config) return;
 

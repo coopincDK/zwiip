@@ -148,6 +148,34 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Swipe cooldown */}
+        <View style={styles.toggleCard}>
+          <View style={styles.toggleInfo}>
+            <Text style={styles.toggleTitle}>{t('settings_cooldown')}</Text>
+            <Text style={styles.toggleDesc}>
+              {settings.swipeCooldown === 0 ? t('settings_cooldown_off') : `${settings.swipeCooldown.toFixed(1)}s`}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            {[0, 0.5, 1, 1.5, 2, 3].map(val => (
+              <TouchableOpacity
+                key={val}
+                onPress={() => updateSettings({ swipeCooldown: val })}
+                style={{
+                  paddingVertical: 6, paddingHorizontal: val === 0 ? 8 : 10,
+                  borderRadius: 8,
+                  backgroundColor: settings.swipeCooldown === val ? COLORS.primary : COLORS.surface,
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>
+                  {val === 0 ? t('settings_cooldown_off_short') : `${val}s`}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Notifications toggle */}
         <View style={styles.toggleCard}>
           <View style={styles.toggleInfo}>
