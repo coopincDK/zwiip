@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useState, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as MediaLibrary from 'expo-media-library';
 
 const AppContext = createContext();
 const LIFETIME_KEY = '@zwiip_lifetime_stats';
@@ -264,7 +265,17 @@ export function AppProvider({ children }) {
   }, [state.lifetimeStats, state.lifetimeLoaded]);
 
   const keepPhoto = useCallback((photo) => dispatch({ type: 'KEEP_PHOTO', payload: photo }), []);
-  const trashPhoto = useCallback((photo) => dispatch({ type: 'TRASH_PHOTO', payload: photo }), []);
+  const trashPhoto = useCallback(async (photo) => {
+    // Fetch fileSize if missing
+    let enriched = photo;
+    if (!photo.fileSize) {
+      try {
+        const info = await MediaLibrary.getAssetInfoAsync(photo.id);
+        enriched = { ...photo, fileSize: info.fileSize || 0 };
+      } catch (e) {}
+    }
+    dispatch({ type: 'TRASH_PHOTO', payload: enriched });
+  }, []);
   const undo = useCallback(() => dispatch({ type: 'UNDO' }), []);
   const removeFromTrash = useCallback((photoId) => dispatch({ type: 'REMOVE_FROM_TRASH', payload: photoId }), []);
   const clearTrash = useCallback(() => dispatch({ type: 'CLEAR_TRASH' }), []);
