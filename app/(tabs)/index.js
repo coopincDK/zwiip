@@ -18,6 +18,7 @@ import { useI18n } from '../../src/i18n';
 import { useSettings, ACTIONS } from '../../src/context/SettingsContext';
 import { usePhotoLibrary } from '../../src/hooks/usePhotoLibrary';
 import { useAlbumManager } from '../../src/hooks/useAlbumManager';
+import { maybeRequestReview } from '../../src/services/reviewPrompt';
 import { useAlbumFilter } from '../../src/hooks/useAlbumFilter';
 import { COLORS, SPACING } from '../../src/constants/theme';
 import { E } from '../../src/constants/emoji';
@@ -295,7 +296,9 @@ export default function SwipeScreen() {
         break;
     }
     startCooldown();
-  }, [settings, trashPhoto, keepPhoto, addToAlbum, startCooldown]);
+    // Check if we should prompt for review (at 20, 100, 500 sorted)
+    maybeRequestReview(currentIndex + 1);
+  }, [settings, trashPhoto, keepPhoto, addToAlbum, startCooldown, currentIndex]);
 
   const handleSwipeLeft = useCallback((photo) => handleSwipeAction(photo, 'swipeLeft'), [handleSwipeAction]);
   const handleSwipeRight = useCallback((photo) => handleSwipeAction(photo, 'swipeRight'), [handleSwipeAction]);

@@ -42,6 +42,8 @@ export default function ChallengeMode({ onStart, onEnd, sessionStats, onShowResu
     const used = CHALLENGE_DURATION - timeLeft;
     const stats = { reviewed: sessionStats.reviewed, trashed: sessionStats.trashed, kept: sessionStats.kept, timeUsed: used, swipesPerMin: used > 0 ? ((sessionStats.reviewed / (used / 60)) || 0).toFixed(1) : '0' };
     setFinalStats(stats); setShowResult(true); onShowResultChange && onShowResultChange(true); onEnd && onEnd(stats);
+    // Prompt review after first challenge
+    import('../../src/services/reviewPrompt').then(m => m.maybeRequestReviewAfterChallenge());
   };
 
   const shareResult = async () => {
