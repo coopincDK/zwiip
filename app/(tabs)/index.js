@@ -253,11 +253,11 @@ export default function SwipeScreen() {
     if (countdownInterval.current) clearInterval(countdownInterval.current);
     countdownInterval.current = setInterval(() => {
       setCooldownRemaining(prev => {
-        const next = prev - 50;
+        const next = prev - 16;
         if (next <= 0) { clearInterval(countdownInterval.current); return 0; }
         return next;
       });
-    }, 50);
+    }, 16);
     cooldownTimer.current = setTimeout(() => {
       setCooldownActive(false);
       setCooldownRemaining(0);
@@ -475,7 +475,7 @@ export default function SwipeScreen() {
 
       {/* Undo toast */}
       {cooldownActive && swipeCooldownMs > 0 && cooldownRemaining > 0 && (
-        <View style={[styles.cooldownOverlay, { opacity: cooldownRemaining < 500 ? cooldownRemaining / 500 : 1 }]} pointerEvents="none">
+        <View style={[styles.cooldownOverlay, { opacity: cooldownRemaining < 1000 ? cooldownRemaining / 1000 : 1 }]} pointerEvents="none">
           <View style={styles.cooldownBadge}>
             <Text style={styles.cooldownTitle}>Zwiip Safe</Text>
             <Text style={styles.cooldownTimer}>{(cooldownRemaining / 1000).toFixed(1)}s</Text>
