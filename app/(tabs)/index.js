@@ -239,15 +239,30 @@ export default function SwipeScreen() {
   const lastSwipeTime = React.useRef(0);
   const swipeCooldownMs = (settings.swipeCooldown || 0) * 1000;
   const [cooldownActive, setCooldownActive] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const cooldownTimer = React.useRef(null);
+  const countdownInterval = React.useRef(null);
   const isSwipeAllowed = useCallback(() => {
     if (swipeCooldownMs <= 0) return true;
     const now = Date.now();
     if (now - lastSwipeTime.current < swipeCooldownMs) return false;
     lastSwipeTime.current = now;
     setCooldownActive(true);
+    setCooldownRemaining(swipeCooldownMs);
     if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
-    cooldownTimer.current = setTimeout(() => setCooldownActive(false), swipeCooldownMs);
+    if (countdownInterval.current) clearInterval(countdownInterval.current);
+    countdownInterval.current = setInterval(() => {
+      setCooldownRemaining(prev => {
+        const next = prev - 50;
+        if (next <= 0) { clearInterval(countdownInterval.current); return 0; }
+        return next;
+      });
+    }, 50);
+    cooldownTimer.current = setTimeout(() => {
+      setCooldownActive(false);
+      setCooldownRemaining(0);
+      clearInterval(countdownInterval.current);
+    }, swipeCooldownMs);
     return true;
   }, [swipeCooldownMs]);
 
@@ -463,7 +478,7 @@ export default function SwipeScreen() {
         <View style={styles.cooldownOverlay} pointerEvents="none">
           <View style={styles.cooldownBadge}>
             <Text style={styles.cooldownTitle}>Zwiip Safe</Text>
-            <Text style={styles.cooldownTimer}>{(settings.swipeCooldown).toFixed(1)}s</Text>
+            <Text style={styles.cooldownTimer}>{(cooldownRemaining / 1000).toFixed(1)}s</Text>
           </View>
         </View>
       )}
