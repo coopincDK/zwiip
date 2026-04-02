@@ -34,6 +34,7 @@ export default function SwipeCard({
   onSwipeDown,
   onTap,
   isTop = true,
+  isSwipeAllowed,
   fullscreen = false,
   containerHeight,
 }) {
@@ -42,8 +43,8 @@ export default function SwipeCard({
   // Legacy position object for overlays (they use pos.x)
   const position = useRef({ x: translateX, y: translateY }).current;
   const didSwipe = useRef(false);
-  const cbRef = useRef({ onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onTap, isTop, photo });
-  cbRef.current = { onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onTap, isTop, photo };
+  const cbRef = useRef({ onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onTap, isTop, photo, isSwipeAllowed });
+  cbRef.current = { onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, onTap, isTop, photo, isSwipeAllowed };
 
   const panResponder = useRef(
     PanResponder.create({
@@ -53,6 +54,9 @@ export default function SwipeCard({
       },
       onMoveShouldSetPanResponder: (_, g) => {
         if (!cbRef.current.isTop) return false;
+        // Check cooldown before allowing swipe
+        const { isSwipeAllowed: checkAllowed } = cbRef.current;
+        if (checkAllowed && !checkAllowed()) return false;
         const dominated = Math.abs(g.dx) > 10 || Math.abs(g.dy) > 10;
         if (dominated) didSwipe.current = true;
         return dominated;
