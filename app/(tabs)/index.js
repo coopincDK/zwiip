@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions, ActivityIndicator, Modal, Touchable
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { scheduleDailyReminders } from '../../src/services/notifications';
 import * as MediaLibrary from 'expo-media-library';
 import SwipeCard from '../../src/components/SwipeCard';
 import ActionButton from '../../src/components/ActionButton';
@@ -62,6 +63,14 @@ export default function SwipeScreen() {
   const [selectedAlbumName, setSelectedAlbumName] = useState('');
   const [undoToast, setUndoToast] = useState(false);
   const undoToastTimer = React.useRef(null);
+
+  // Schedule notifications on load
+  useEffect(() => {
+    if (hasPermission && photos.length > 0) {
+      const unsorted = photos.length - processedIds.size;
+      scheduleDailyReminders({ unsortedCount: unsorted, t }).catch(() => {});
+    }
+  }, [hasPermission, photos.length > 0]);
 
   // Load Memory Lane: ~50 random photos per year, skip current year
   useEffect(() => {

@@ -49,7 +49,9 @@ export default function ChallengeMode({ onStart, onEnd, sessionStats, onShowResu
     const min = Math.floor(finalStats.timeUsed / 60);
     const sec = (finalStats.timeUsed % 60).toString().padStart(2, '0');
     try {
-      await Share.share({ message: t('challenge_share_msg', { reviewed: finalStats.reviewed, trashed: finalStats.trashed, swipesPerMin: finalStats.swipesPerMin, time: `${min}:${sec}` }) });
+      const msg = t('challenge_share_msg', { reviewed: finalStats.reviewed, trashed: finalStats.trashed, swipesPerMin: finalStats.swipesPerMin, time: `${min}:${sec}` });
+      const link = t('challenge_share_link');
+      await Share.share({ message: msg + '\n\n' + link });
     } catch (e) {}
   };
 

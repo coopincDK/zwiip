@@ -34,6 +34,7 @@ export default {
   challenge_share: '📤 Challenge a friend',
   challenge_retry: '🔄 Try again',
   challenge_dismiss: 'Back to free sorting',
+  challenge_share_link: 'https://apps.apple.com/app/zwiip/id000000000',
   challenge_share_msg: '🔥 Zwiip Challenge!\n\n📸 {reviewed} photos sorted\n🗑 {trashed} trashed\n⚡ {swipesPerMin} swipes/min\n⏱ In {time}\n\nCan you beat my score? 💪\n#ZwiipChallenge',
 
   // Trash screen
@@ -125,6 +126,14 @@ export default {
   settings_language: '🌐 Language',
   trash_trashed_toast: 'Photo trashed',
   trash_undo_btn: 'UNDO',
+  // Notifications
+  notif_unsorted: 'You have {count} unsorted photos waiting \uD83D\uDCF8',
+  notif_free_ready: 'Your next 50 photos are ready to sort!',
+  notif_challenge: 'Got 1 minute? Sort some photos! \u26A1',
+  notif_social: 'Challenge a friend \u2014 who sorts faster? \uD83D\uDCAA',
+  settings_notifications: '\uD83D\uDD14 Notifications',
+  settings_notif_on: 'Daily reminders on',
+  settings_notif_off: 'Daily reminders off',
   settings_tutorial: '📖 See tutorial again',
   settings_tutorial_title: 'Tutorial reset',
   settings_tutorial_msg: 'The tutorial will show next time you open the app.',

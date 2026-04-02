@@ -34,6 +34,7 @@ export default {
   challenge_share: '📤 Udfordre en ven',
   challenge_retry: '🔄 Prøv igen',
   challenge_dismiss: 'Tilbage til fri sortering',
+  challenge_share_link: 'https://apps.apple.com/app/zwiip/id000000000',
   challenge_share_msg: '🔥 Zwiip Challenge!\n\n📸 {reviewed} billeder sorteret\n🗑 {trashed} kasseret\n⚡ {swipesPerMin} swipes/min\n⏱ På {time}\n\nKan du slå min score? 💪\n#ZwiipChallenge',
 
   // Trash screen
@@ -125,6 +126,14 @@ export default {
   settings_language: '🌐 Sprog',
   trash_trashed_toast: 'Billede kasseret',
   trash_undo_btn: 'FORTRYD',
+  // Notifications
+  notif_unsorted: 'Du har {count} usorterede billeder der venter \uD83D\uDCF8',
+  notif_challenge: 'Har du 1 minut? Sortér nogle billeder! ⚡',
+  notif_social: 'Udfordr en ven — hvem sorterer hurtigst? 💪',
+  notif_free_ready: 'Dine n\u00e6ste 50 billeder er klar til sortering!',
+  settings_notifications: '\uD83D\uDD14 Notifikationer',
+  settings_notif_on: 'Daglige p\u00e5mindelser til',
+  settings_notif_off: 'Daglige p\u00e5mindelser fra',
   settings_tutorial: '📖 Se tutorial igen',
   settings_tutorial_title: 'Tutorial nulstillet',
   settings_tutorial_msg: 'Tutorialen vises næste gang du åbner appen.',

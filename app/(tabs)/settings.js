@@ -8,6 +8,7 @@ import { COLORS, SPACING } from '../../src/constants/theme';
 import { E } from '../../src/constants/emoji';
 import { useI18n, LANGUAGES } from '../../src/i18n';
 import { useRouter } from 'expo-router';
+import { isNotificationsEnabled, setNotificationsEnabled } from '../../src/services/notifications';
 
 function DirectionConfig({ direction, config, onUpdate, t }) {
   const [showAlbumPicker, setShowAlbumPicker] = useState(false);
@@ -69,6 +70,11 @@ export default function SettingsScreen() {
   const { settings, updateSettings, updateDirection, resetSettings } = useSettings();
   const { t, language, override, setLanguage } = useI18n();
   const [showLangPicker, setShowLangPicker] = useState(false);
+  const [notifsOn, setNotifsOn] = useState(true);
+
+  React.useEffect(() => {
+    isNotificationsEnabled().then(setNotifsOn);
+  }, []);
 
   const DIRECTIONS = [
     { key: 'swipeLeft', label: t('dir_left'), arrow: '\u2190' },
@@ -139,6 +145,25 @@ export default function SettingsScreen() {
             activeOpacity={0.7}
           >
             <View style={[styles.toggleKnob, settings.skipAlbumPhotos && styles.toggleKnobOn]} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Notifications toggle */}
+        <View style={styles.toggleCard}>
+          <View style={styles.toggleInfo}>
+            <Text style={styles.toggleTitle}>{t('settings_notifications')}</Text>
+            <Text style={styles.toggleDesc}>{notifsOn ? t('settings_notif_on') : t('settings_notif_off')}</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.toggle, notifsOn && styles.toggleOn]}
+            onPress={async () => {
+              const next = !notifsOn;
+              setNotifsOn(next);
+              await setNotificationsEnabled(next);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.toggleKnob, notifsOn && styles.toggleKnobOn]} />
           </TouchableOpacity>
         </View>
 
