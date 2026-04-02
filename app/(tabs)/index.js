@@ -244,9 +244,11 @@ export default function SwipeScreen() {
   const countdownInterval = React.useRef(null);
   const isSwipeAllowed = useCallback(() => {
     if (swipeCooldownMs <= 0) return true;
-    const now = Date.now();
-    if (now - lastSwipeTime.current < swipeCooldownMs) return false;
-    lastSwipeTime.current = now;
+    return !cooldownActive;
+  }, [swipeCooldownMs, cooldownActive]);
+
+  const startCooldown = useCallback(() => {
+    if (swipeCooldownMs <= 0) return;
     setCooldownActive(true);
     setCooldownRemaining(swipeCooldownMs);
     if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
@@ -263,7 +265,6 @@ export default function SwipeScreen() {
       setCooldownRemaining(0);
       clearInterval(countdownInterval.current);
     }, swipeCooldownMs);
-    return true;
   }, [swipeCooldownMs]);
 
   // Swipe action handler
@@ -293,7 +294,8 @@ export default function SwipeScreen() {
         keepPhoto(photo);
         break;
     }
-  }, [settings, trashPhoto, keepPhoto, addToAlbum]);
+    startCooldown();
+  }, [settings, trashPhoto, keepPhoto, addToAlbum, startCooldown]);
 
   const handleSwipeLeft = useCallback((photo) => handleSwipeAction(photo, 'swipeLeft'), [handleSwipeAction]);
   const handleSwipeRight = useCallback((photo) => handleSwipeAction(photo, 'swipeRight'), [handleSwipeAction]);
