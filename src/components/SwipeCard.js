@@ -72,9 +72,9 @@ export default function SwipeCard({
             Animated.timing(translateX, { toValue: toX, duration: 200, useNativeDriver: true }),
             Animated.timing(translateY, { toValue: toY, duration: 200, useNativeDriver: true }),
           ]).start(() => {
+            cb(); // unmount first, then reset
             translateX.setValue(0);
             translateY.setValue(0);
-            cb();
           });
         };
 
