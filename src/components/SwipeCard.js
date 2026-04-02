@@ -146,8 +146,13 @@ export default function SwipeCard({
       <SwipeOverlays pos={position} />
 
       <View style={styles.infoBar} pointerEvents="none">
-        <Text style={styles.dateText}>{dateStr}</Text>
-        <Text style={styles.filenameText} numberOfLines={1}>{photo.filename}</Text>
+        <View>
+          <Text style={styles.dateText}>{dateStr}</Text>
+          <Text style={styles.filenameText} numberOfLines={1}>{photo.filename}</Text>
+        </View>
+        {photo.fileSize > 0 && (
+          <Text style={styles.sizeText}>{(photo.fileSize / (1024 * 1024)).toFixed(1)} MB</Text>
+        )}
       </View>
     </Animated.View>
   );
@@ -163,5 +168,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
   dateText: { color: '#fff', fontSize: 14, fontWeight: '600' },
-  filenameText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, maxWidth: '50%' },
+  filenameText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 2 },
+  sizeText: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: '700' },
 });

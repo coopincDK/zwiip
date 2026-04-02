@@ -37,16 +37,24 @@ export function usePhotoLibrary() {
 
       const result = await MediaLibrary.getAssetsAsync(options);
       
-      const newPhotos = result.assets.map(asset => ({
-        id: asset.id,
-        uri: asset.uri,
-        filename: asset.filename,
-        width: asset.width,
-        height: asset.height,
-        fileSize: asset.fileSize || 0,
-        creationTime: asset.creationTime,
-        duration: asset.duration,
-        mediaType: asset.mediaType,
+      // Fetch fileSize for each asset (getAssetsAsync doesn't include it)
+      const newPhotos = await Promise.all(result.assets.map(async asset => {
+        let fileSize = 0;
+        try {
+          const info = await MediaLibrary.getAssetInfoAsync(asset.id);
+          fileSize = info.fileSize || 0;
+        } catch (e) {}
+        return {
+          id: asset.id,
+          uri: asset.uri,
+          filename: asset.filename,
+          width: asset.width,
+          height: asset.height,
+          fileSize,
+          creationTime: asset.creationTime,
+          duration: asset.duration,
+          mediaType: asset.mediaType,
+        };
       }));
 
       if (reset) {
