@@ -238,11 +238,16 @@ export default function SwipeScreen() {
   // Swipe cooldown
   const lastSwipeTime = React.useRef(0);
   const swipeCooldownMs = (settings.swipeCooldown || 0) * 1000;
+  const [cooldownActive, setCooldownActive] = useState(false);
+  const cooldownTimer = React.useRef(null);
   const isSwipeAllowed = useCallback(() => {
     if (swipeCooldownMs <= 0) return true;
     const now = Date.now();
     if (now - lastSwipeTime.current < swipeCooldownMs) return false;
     lastSwipeTime.current = now;
+    setCooldownActive(true);
+    if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
+    cooldownTimer.current = setTimeout(() => setCooldownActive(false), swipeCooldownMs);
     return true;
   }, [swipeCooldownMs]);
 
@@ -435,7 +440,7 @@ export default function SwipeScreen() {
             onSwipeRight={handleSwipeRight}
             onSwipeUp={handleSwipeUp}
             onSwipeDown={handleSwipeDown}
-            onTap={() => setFocusMode(true)}
+            onTap={() => !cooldownActive && setFocusMode(true)}
             isTop={true}
             isSwipeAllowed={isSwipeAllowed}
           />
@@ -454,6 +459,14 @@ export default function SwipeScreen() {
       </View>
 
       {/* Undo toast */}
+      {cooldownActive && swipeCooldownMs > 0 && (
+        <View style={styles.cooldownOverlay} pointerEvents="none">
+          <View style={styles.cooldownBadge}>
+            <Text style={styles.cooldownText}>\u23F1 Zwiip Safe</Text>
+          </View>
+        </View>
+      )}
+
       {undoToast && undoStack.length > 0 && (
         <TouchableOpacity style={styles.undoToast} onPress={handleUndo} activeOpacity={0.8}>
           <Text style={styles.undoToastText}>{t('trash_trashed_toast')}</Text>
@@ -475,6 +488,7 @@ export default function SwipeScreen() {
               isTop={true}
               fullscreen={true}
               onTap={() => setFocusMode(false)}
+              isSwipeAllowed={isSwipeAllowed}
             />
             <TouchableOpacity style={styles.focusClose} onPress={() => setFocusMode(false)} activeOpacity={0.7}>
               <Text style={styles.focusCloseText}>✕</Text>
@@ -535,6 +549,18 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 0, left: 16, right: 16, bottom: 0,
     backgroundColor: COLORS.surface, borderRadius: 10,
     justifyContent: 'center', alignItems: 'center',
+  },
+  cooldownOverlay: {
+    position: 'absolute', top: 60, left: 0, right: 0,
+    alignItems: 'center', zIndex: 30,
+  },
+  cooldownBadge: {
+    backgroundColor: 'rgba(108,92,231,0.85)',
+    paddingHorizontal: 16, paddingVertical: 8,
+    borderRadius: 20,
+  },
+  cooldownText: {
+    color: '#fff', fontSize: 14, fontWeight: '700',
   },
   undoToast: {
     position: 'absolute', bottom: 100, left: 20, right: 20,
