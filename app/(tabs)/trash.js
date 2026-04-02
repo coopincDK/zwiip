@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -14,8 +14,21 @@ const THUMB_SIZE = (SCREEN_WIDTH - SPACING.lg * 2 - SPACING.sm * 2) / 3;
 export default function TrashScreen() {
   const { t } = useI18n();
   const { trashed, restoreFromTrash, clearTrash, recordDeletion } = useApp();
-  const { deletePhotos } = usePhotoLibrary();
+  const { deletePhotos, enrichPhoto } = usePhotoLibrary();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [enrichedTrash, setEnrichedTrash] = useState([]);
+
+  // Enrich trashed photos with fileSize
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const enriched = await Promise.all(
+        trashed.map(p => p.fileSize > 0 ? p : enrichPhoto(p))
+      );
+      if (!cancelled) setEnrichedTrash(enriched);
+    })();
+    return () => { cancelled = true; };
+  }, [trashed]);
 
   const handleDeleteAll = () => {
     Alert.alert(
@@ -73,7 +86,8 @@ export default function TrashScreen() {
     );
   }
 
-  const totalSize = trashed.reduce((sum, p) => sum + (p.fileSize || 0), 0);
+  const displayTrash = enrichedTrash.length === trashed.length ? enrichedTrash : trashed;
+  const totalSize = displayTrash.reduce((sum, p) => sum + (p.fileSize || 0), 0);
   const sizeMB = (totalSize / (1024 * 1024)).toFixed(1);
 
   return (
@@ -93,7 +107,7 @@ export default function TrashScreen() {
       </View>
 
       <FlatList
-        data={trashed}
+        data={displayTrash}
         keyExtractor={(item) => item.id}
         numColumns={3}
         contentContainerStyle={styles.grid}
