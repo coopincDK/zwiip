@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 12.0.0"
+    "version": ">= 12.0.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -25,9 +26,9 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "FILL_IN_APPLE_ID",
-        "ascAppId": "FILL_IN_ASC_APP_ID",
-        "appleTeamId": "FILL_IN_TEAM_ID"
+        "appleId": "mikkel@smartpack.dk",
+        "ascAppId": "6761864150",
+        "appleTeamId": "39QGDJ5Y64"
       }
     }
   }
